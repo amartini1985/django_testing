@@ -70,7 +70,7 @@ class TestRoute(TestCase):
             ('notes:list', None),
             ('notes:add', None),
             ('notes:success', None),
-            )
+        )
         login_url = reverse('users:login')
         for name, args in urls:
             with self.subTest(name=name):
