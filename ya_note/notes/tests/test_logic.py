@@ -5,13 +5,13 @@ from pytils.translit import slugify
 
 from notes.forms import WARNING
 from notes.models import Note
-from .fixtures import BaseFixtures, BaseFixturesWithoutNote
+from .fixtures import BaseFixtures
 
 
 User = get_user_model()
 
 
-class TestNotesCreation(BaseFixturesWithoutNote):
+class TestNotesCreation(BaseFixtures):
 
     def test_anonymous_user_cant_create_note(self):
         note_count_start = Note.objects.count()
@@ -46,16 +46,18 @@ class TestNotesCreation(BaseFixturesWithoutNote):
 class TestNoteEditDelete(BaseFixtures):
 
     def test_author_can_delete_note(self):
+        note_count_start = Note.objects.count()
         responce = self.auth_client.delete(self.DELETE_URL)
         self.assertRedirects(responce, self.SUCCESS_URL)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, 0)
+        self.assertEqual(notes_count, note_count_start - 1)
 
     def test_reader_cant_delete_note(self):
+        note_count_start = Note.objects.count()
         responce = self.read_client.delete(self.DELETE_URL)
         self.assertEqual(responce.status_code, HTTPStatus.NOT_FOUND)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, 1)
+        self.assertEqual(notes_count, note_count_start)
 
     def test_author_can_edit_note(self):
         responce = self.auth_client.post(self.EDIT_URL, data=self.form_data)
@@ -63,6 +65,7 @@ class TestNoteEditDelete(BaseFixtures):
         note_from_bd = Note.objects.get(id=self.note.id)
         self.assertEqual(note_from_bd.title, self.form_data['title'])
         self.assertEqual(note_from_bd.text, self.form_data['text'])
+        self.assertEqual(note_from_bd.author, self.form_data['author'])
 
     def test_reader_can_edit_note(self):
         responce = self.read_client.post(self.EDIT_URL, data=self.form_data)
@@ -72,8 +75,7 @@ class TestNoteEditDelete(BaseFixtures):
         self.assertEqual(note_from_bd.text, self.TEXT_NOTE)
 
     def test_notes_matching_slug(self):
-        note_count = Note.objects.count()
-        self.assertEqual(note_count, 1)
+        note_count_start = Note.objects.count()
         response = self.auth_client.post(self.ADD_URL, data=self.form_data)
         self.assertFormError(
             response,
@@ -82,4 +84,4 @@ class TestNoteEditDelete(BaseFixtures):
             errors=self.note.slug + WARNING
         )
         note_count = Note.objects.count()
-        self.assertEqual(note_count, 1)
+        self.assertEqual(note_count, note_count_start)

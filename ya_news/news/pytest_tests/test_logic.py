@@ -3,7 +3,7 @@ from http import HTTPStatus
 import pytest
 from pytest_django.asserts import assertRedirects, assertFormError
 
-from news.forms import BAD_WORDS, WARNING
+from news.forms import WARNING
 from news.models import Comment
 
 
@@ -36,10 +36,10 @@ def test_user_can_create_comment(
 
 def test_user_cant_use_bad_words(
         author_client,
-        url_detail
+        url_detail,
+        bad_word
 ):
-    bad_words_data = {'text': f'Какой-то текст, {BAD_WORDS[0]}, еще текст'}
-    response = author_client.post(url_detail, data=bad_words_data)
+    response = author_client.post(url_detail, data=bad_word)
     assertFormError(
         response,
         form='form',
@@ -74,9 +74,7 @@ def test_user_cant_delete_comment_of_another_user(
 
 def test_author_can_edit_comment(
         author_client,
-        author,
         comment,
-        news,
         form_data,
         url_edit,
         url_detail
@@ -86,8 +84,8 @@ def test_author_can_edit_comment(
     assertRedirects(response, comment_url)
     comment_from_bd = Comment.objects.get(id=comment.id)
     assert comment_from_bd.text == form_data['text']
-    assert comment_from_bd.news == news
-    assert comment_from_bd.author == author
+    assert comment_from_bd.news == comment.news
+    assert comment_from_bd.author == comment.author
 
 
 def test_user_cant_edit_comment_of_another(

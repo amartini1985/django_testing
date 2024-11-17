@@ -6,6 +6,7 @@ from django.test.client import Client
 from django.urls import reverse
 from django.utils import timezone
 
+from news.forms import BAD_WORDS
 from news.models import Comment, News
 
 
@@ -48,11 +49,6 @@ def comment(news, author):
         text='Текст комментария',
         author=author
     )
-
-
-@pytest.fixture
-def id_for_args(news):
-    return (news.id,)
 
 
 @pytest.fixture
@@ -133,3 +129,8 @@ def url_edit(comment):
 @pytest.fixture
 def url_delete(comment):
     return reverse('news:delete', args=(comment.id,))
+
+
+@pytest.fixture
+def bad_word():
+    return {'text': f'Какой-то текст, {BAD_WORDS[0]}, еще текст'}

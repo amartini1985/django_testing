@@ -34,14 +34,13 @@ class TestRoutes(BaseFixtures):
 
     def test_availability_for_notes_edit_and_delete(self):
         users_statuses = (
-            (self.author, HTTPStatus.OK),
-            (self.reader, HTTPStatus.NOT_FOUND),
+            (self.auth_client, HTTPStatus.OK),
+            (self.read_client, HTTPStatus.NOT_FOUND),
         )
         for user, status in users_statuses:
-            self.client.force_login(user)
             for url in (self.DETAIL_URL, self.EDIT_URL, self.DELETE_URL):
                 with self.subTest(user=user, name=url):
-                    response = self.client.get(url)
+                    response = user.get(url)
                     self.assertEqual(response.status_code, status)
 
     def test_redirect_for_anonymous_client(self):

@@ -17,7 +17,7 @@ class TestContent(BaseFixtures):
             with self.subTest(name=name):
                 response = name.get(self.LIST_URL)
                 object_list = response.context['object_list']
-                self.assertEqual((self.note in object_list), result)
+                self.assertIs((self.note in object_list), result)
 
     def test_authorized_client_has_form(self):
         urls = (self.ADD_URL, self.EDIT_URL)
