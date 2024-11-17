@@ -1,9 +1,9 @@
-import pytest
-
 from datetime import datetime, timedelta
 
+import pytest
 from django.conf import settings
 from django.test.client import Client
+from django.urls import reverse
 from django.utils import timezone
 
 from news.models import Comment, News
@@ -35,21 +35,19 @@ def not_author_client(not_author):
 
 @pytest.fixture
 def news():
-    news = News.objects.create(
+    return News.objects.create(
         title='Заголовок',
         text='Текст'
     )
-    return news
 
 
 @pytest.fixture
 def comment(news, author):
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         news=news,
         text='Текст комментария',
         author=author
     )
-    return comment
 
 
 @pytest.fixture
@@ -69,7 +67,6 @@ def many_news():
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     ]
     News.objects.bulk_create(all_news)
-    return all_news
 
 
 @pytest.fixture
@@ -86,3 +83,53 @@ def many_comments(news, author):
 @pytest.fixture
 def form_data():
     return {'text': 'Новый текст'}
+
+
+@pytest.fixture
+def url_home():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def url_list():
+    return reverse('notes:list')
+
+
+@pytest.fixture
+def url_add():
+    return reverse('notes:add')
+
+
+@pytest.fixture
+def url_login():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def url_logout():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def url_signup():
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def url_success():
+    return reverse('notes:success')
+
+
+@pytest.fixture
+def url_detail(news):
+    return reverse('news:detail', args=(news.id,))
+
+
+@pytest.fixture
+def url_edit(comment):
+    return reverse('news:edit', args=(comment.id,))
+
+
+@pytest.fixture
+def url_delete(comment):
+    return reverse('news:delete', args=(comment.id,))
