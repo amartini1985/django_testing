@@ -43,12 +43,7 @@ class BaseFixtures(BaseFixturesWithoutNote):
 
     @classmethod
     def setUpTestData(cls):
-        cls.author = User.objects.create(username='User1')
-        cls.auth_client = Client()
-        cls.auth_client.force_login(cls.author)
-        cls.reader = User.objects.create(username='User2')
-        cls.read_client = Client()
-        cls.read_client.force_login(cls.reader)
+        super(BaseFixtures, cls).setUpTestData()
         cls.note = Note.objects.create(
             title=cls.TITLE_NOTE,
             text=cls.TEXT_NOTE,
